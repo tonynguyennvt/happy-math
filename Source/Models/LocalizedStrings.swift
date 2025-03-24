@@ -53,6 +53,24 @@ public struct LocalizedStrings {
         }
     }
     
+    public var fractionsTitle: String {
+        switch language {
+        case .english: return "Fraction Fun"
+        case .chinese: return "分数乐趣"
+        case .vietnamese: return "Phân Số"
+        case .system: return "Fraction Fun"
+        }
+    }
+    
+    public var decimalsTitle: String {
+        switch language {
+        case .english: return "Decimal Discovery"
+        case .chinese: return "小数探索"
+        case .vietnamese: return "Số Thập Phân"
+        case .system: return "Decimal Discovery"
+        }
+    }
+    
     // MARK: - Navigation
     public var back: String {
         switch language {
@@ -244,6 +262,15 @@ public struct LocalizedStrings {
         case .chinese: return "再试一次！😊"
         case .vietnamese: return "Thử lại nhé! 😊"
         case .system: return "Try again! 😊"
+        }
+    }
+    
+    public var incorrect: String {
+        switch language {
+        case .english: return "Try Again"
+        case .chinese: return "再试一次"
+        case .vietnamese: return "Thử Lại"
+        case .system: return "Try Again"
         }
     }
 } 

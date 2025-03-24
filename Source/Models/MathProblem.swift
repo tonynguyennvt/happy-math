@@ -1,30 +1,140 @@
 import Foundation
 
-public struct MathProblem {
-    public let firstNumber: Int
-    public let secondNumber: Int
-    public let operation: GameType
-    public let level: Int
+protocol MathProblem {
+    var firstNumber: Int { get }
+    var secondNumber: Int { get }
+    var operation: GameType { get }
+    var level: Int { get }
+    var question: String { get }
+    var correctAnswer: Int { get }
     
-    // Track used results for each level and game type
-    private static var usedResults: [String: Set<Int>] = [:] // [gameType_level: Set of used results]
-    private static let maxAttemptsToFindNewResult = 100
-    
-    public var question: String {
-        "\(firstNumber) \(operationSymbol) \(secondNumber)"
-    }
-    
-    private var operationSymbol: String {
-        switch operation {
-        case .addition: return "+"
-        case .subtraction: return "-"
-        case .multiplication: return "×"
-        case .division: return "÷"
-        case .comparison: return "?"
+    static func random(level: Int) -> Self
+}
+
+extension MathProblem {
+    static func random(gameType: GameType, level: Int) -> any MathProblem {
+        switch gameType {
+        case .addition:
+            return generateAdditionProblem(level: level)
+        case .subtraction:
+            return generateSubtractionProblem(level: level)
+        case .multiplication:
+            return generateMultiplicationProblem(level: level)
+        case .division:
+            return generateDivisionProblem(level: level)
+        case .comparison:
+            return generateComparisonProblem(level: level)
+        case .fractions:
+            return FractionProblem.random(level: level)
+        case .decimals:
+            return DecimalProblem.random(level: level)
         }
     }
     
-    public var correctAnswer: Int {
+    private static func generateAdditionProblem(level: Int) -> MathProblem {
+        let maxResult = level * 10
+        var first: Int
+        var second: Int
+        
+        repeat {
+            first = Int.random(in: 0...maxResult)
+            second = Int.random(in: 0...maxResult)
+        } while first + second > maxResult
+        
+        return BasicMathProblem(
+            firstNumber: first,
+            secondNumber: second,
+            operation: .addition,
+            level: level
+        )
+    }
+    
+    private static func generateSubtractionProblem(level: Int) -> MathProblem {
+        let maxResult = level * 10
+        var first: Int
+        var second: Int
+        
+        repeat {
+            first = Int.random(in: 0...maxResult)
+            second = Int.random(in: 0...maxResult)
+        } while first - second < 0 || first - second > maxResult
+        
+        return BasicMathProblem(
+            firstNumber: first,
+            secondNumber: second,
+            operation: .subtraction,
+            level: level
+        )
+    }
+    
+    private static func generateMultiplicationProblem(level: Int) -> MathProblem {
+        let first = Int.random(in: 1...level)
+        let second = Int.random(in: 1...10)
+        
+        return BasicMathProblem(
+            firstNumber: first,
+            secondNumber: second,
+            operation: .multiplication,
+            level: level
+        )
+    }
+    
+    private static func generateDivisionProblem(level: Int) -> MathProblem {
+        let second = Int.random(in: 1...level)
+        let quotient = Int.random(in: 1...10)
+        let first = second * quotient
+        
+        return BasicMathProblem(
+            firstNumber: first,
+            secondNumber: second,
+            operation: .division,
+            level: level
+        )
+    }
+    
+    private static func generateComparisonProblem(level: Int) -> MathProblem {
+        let maxNumber = level * 10
+        var first: Int
+        var second: Int
+        
+        repeat {
+            first = Int.random(in: 0...maxNumber)
+            second = Int.random(in: 0...maxNumber)
+        } while first == second
+        
+        return BasicMathProblem(
+            firstNumber: first,
+            secondNumber: second,
+            operation: .comparison,
+            level: level
+        )
+    }
+}
+
+struct BasicMathProblem: MathProblem {
+    let firstNumber: Int
+    let secondNumber: Int
+    let operation: GameType
+    let level: Int
+    
+    var question: String {
+        switch operation {
+        case .addition:
+            return "\(firstNumber) + \(secondNumber)"
+        case .subtraction:
+            return "\(firstNumber) - \(secondNumber)"
+        case .multiplication:
+            return "\(firstNumber) × \(secondNumber)"
+        case .division:
+            return "\(firstNumber) ÷ \(secondNumber)"
+        case .comparison:
+            return "\(firstNumber) ? \(secondNumber)"
+        default:
+            return ""
+        }
+    }
+    
+    var correctAnswer: Int {
         switch operation {
         case .addition:
             return firstNumber + secondNumber
@@ -35,116 +145,13 @@ public struct MathProblem {
         case .division:
             return firstNumber / secondNumber
         case .comparison:
-            return firstNumber > secondNumber ? 1 : 0 // 1 for ">", 0 for "<"
+            return firstNumber > secondNumber ? 1 : 0
+        default:
+            return 0
         }
     }
     
-    public init(firstNumber: Int, secondNumber: Int, operation: GameType, level: Int) {
-        self.firstNumber = firstNumber
-        self.secondNumber = secondNumber
-        self.operation = operation
-        self.level = level
-    }
-    
-    // Reset used results for a specific level and game type
-    public static func resetUsedResults(for gameType: GameType, level: Int) {
-        let key = "\(gameType.rawValue)_\(level)"
-        usedResults[key] = []
-    }
-    
-    // Check if we've used all possible results for this level
-    private static func hasUsedAllResults(for gameType: GameType, level: Int) -> Bool {
-        let key = "\(gameType.rawValue)_\(level)"
-        let maxResults = level * 10
-        return usedResults[key]?.count ?? 0 >= maxResults
-    }
-    
-    // Add a result to the used results set
-    private static func addUsedResult(_ result: Int, for gameType: GameType, level: Int) {
-        let key = "\(gameType.rawValue)_\(level)"
-        if usedResults[key] == nil {
-            usedResults[key] = []
-        }
-        usedResults[key]?.insert(result)
-    }
-    
-    // Check if a result has been used
-    private static func isResultUsed(_ result: Int, for gameType: GameType, level: Int) -> Bool {
-        let key = "\(gameType.rawValue)_\(level)"
-        // If we've used all possible results, allow repeats
-        if hasUsedAllResults(for: gameType, level: level) {
-            return false
-        }
-        return usedResults[key]?.contains(result) ?? false
-    }
-    
-    // Generate a random math problem based on level and operation type
-    public static func random(gameType: GameType, level: Int) -> MathProblem {
-        let maxResult = level * 10 // Maximum allowed result for any operation
-        var first: Int
-        var second: Int
-        var problem: MathProblem
-        var attempts = 0
-        
-        repeat {
-            attempts += 1
-            switch gameType {
-            case .addition:
-                repeat {
-                    first = Int.random(in: 0...maxResult)
-                    second = Int.random(in: 0...maxResult)
-                } while first + second > maxResult
-                
-            case .subtraction:
-                repeat {
-                    first = Int.random(in: 0...maxResult)
-                    second = Int.random(in: 0...maxResult)
-                } while first - second < 0 || first - second > maxResult
-                
-            case .multiplication:
-                // First number: Random number from 1 to n (level)
-                // Second number: Random number from 1 to 10
-                first = Int.random(in: 1...level)
-                second = Int.random(in: 1...10)
-                
-            case .division:
-                // Second number: Random number from 1 to n (level)
-                second = Int.random(in: 1...level)
-                // Generate a random quotient from 1 to 10
-                let quotient = Int.random(in: 1...10)
-                // Calculate first number to ensure it's divisible by second number
-                first = second * quotient
-                // If first number is too large, adjust it
-                if first > maxResult {
-                    first = maxResult - (maxResult % second)
-                }
-                
-            case .comparison:
-                repeat {
-                    first = Int.random(in: 0...maxResult)
-                    second = Int.random(in: 0...maxResult)
-                } while first == second // Ensure numbers are different
-            }
-            
-            problem = MathProblem(
-                firstNumber: first,
-                secondNumber: second,
-                operation: gameType,
-                level: level
-            )
-            
-            // If we've tried too many times, allow a repeat
-            if attempts >= maxAttemptsToFindNewResult {
-                break
-            }
-            
-        } while isResultUsed(problem.correctAnswer, for: gameType, level: level)
-        
-        // Only store the result if we haven't used all possible results
-        if !hasUsedAllResults(for: gameType, level: level) {
-            addUsedResult(problem.correctAnswer, for: gameType, level: level)
-        }
-        
-        return problem
+    static func random(level: Int) -> BasicMathProblem {
+        fatalError("Use MathProblem.random(gameType:level:) instead")
     }
 } 

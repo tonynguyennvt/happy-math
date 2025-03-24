@@ -3,7 +3,7 @@ import SwiftUI
 
 @MainActor
 class GameViewModel: ObservableObject {
-    @Published private(set) var currentProblem: MathProblem?
+    @Published private(set) var currentProblem: (any MathProblem)?
     @Published private(set) var problemText: String = ""
     @Published private(set) var currentAnswer: String = ""
     @Published private(set) var answerOptions: [Int] = []
@@ -41,20 +41,34 @@ class GameViewModel: ObservableObject {
     
     private func generateAnswerOptions() -> [Int] {
         guard let problem = currentProblem else { return [] }
-        var options = Set<Int>()
-        options.insert(problem.correctAnswer)
         
-        // Generate wrong answers based on the correct answer
-        while options.count < 4 {
-            if let wrongAnswer = generateWrongAnswer(for: problem) {
-                options.insert(wrongAnswer)
+        switch gameType {
+        case .fractions:
+            if let fractionProblem = problem as? FractionProblem {
+                return FractionProblem.generateAnswerOptions(for: fractionProblem)
             }
+        case .decimals:
+            if let decimalProblem = problem as? DecimalProblem {
+                return DecimalProblem.generateAnswerOptions(for: decimalProblem)
+            }
+        default:
+            var options = Set<Int>()
+            options.insert(problem.correctAnswer)
+            
+            // Generate wrong answers based on the correct answer
+            while options.count < 4 {
+                if let wrongAnswer = generateWrongAnswer(for: problem) {
+                    options.insert(wrongAnswer)
+                }
+            }
+            
+            return Array(options).shuffled()
         }
         
-        return Array(options).shuffled()
+        return []
     }
     
-    private func generateWrongAnswer(for problem: MathProblem) -> Int? {
+    private func generateWrongAnswer(for problem: any MathProblem) -> Int? {
         let correctAnswer = problem.correctAnswer
         let level = currentLevel
         let maxResult = level * 10
@@ -94,6 +108,9 @@ class GameViewModel: ObservableObject {
             // For comparison, use numbers close to the correct answer
             let wrongAnswer = correctAnswer + [-2, -1, 1, 2].randomElement()!
             return max(0, wrongAnswer) // Ensure answer is not negative
+            
+        default:
+            return nil
         }
     }
 } 

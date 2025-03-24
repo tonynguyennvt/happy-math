@@ -6,6 +6,8 @@ public enum GameType: String, CaseIterable, Identifiable, Codable {
     case multiplication
     case division
     case comparison
+    case fractions
+    case decimals
     
     public var id: String { rawValue }
     
@@ -16,6 +18,8 @@ public enum GameType: String, CaseIterable, Identifiable, Codable {
         case .multiplication: return "multiply"
         case .division: return "divide"
         case .comparison: return "arrow.left.arrow.right"
+        case .fractions: return "circle.grid.2x2"
+        case .decimals: return "decimal"
         }
     }
     
@@ -26,6 +30,8 @@ public enum GameType: String, CaseIterable, Identifiable, Codable {
         case .multiplication: return .purple
         case .division: return .orange
         case .comparison: return .teal
+        case .fractions: return .pink
+        case .decimals: return .indigo
         }
     }
     
@@ -36,6 +42,8 @@ public enum GameType: String, CaseIterable, Identifiable, Codable {
         case .multiplication: return strings.multiplicationTitle
         case .division: return strings.divisionTitle
         case .comparison: return strings.comparisonTitle
+        case .fractions: return strings.fractionsTitle
+        case .decimals: return strings.decimalsTitle
         }
     }
 } 

@@ -31,6 +31,14 @@ struct GameView: View {
                 ComparisonGameView()
                     .environmentObject(progressManager)
                     .environmentObject(localizationManager)
+            case .fractions:
+                FractionsGameView()
+                    .environmentObject(progressManager)
+                    .environmentObject(localizationManager)
+            case .decimals:
+                DecimalsGameView()
+                    .environmentObject(progressManager)
+                    .environmentObject(localizationManager)
             }
         }
         .interactiveDismissDisabled()
@@ -178,7 +186,9 @@ struct GameAnswerOptions: View, Equatable {
         VStack(spacing: 16) {
             ForEach(options, id: \.self) { option in
                 Button(action: { onSelect(option) }) {
-                    Text("\(option)")
+                    Text(gameType == .decimals || gameType == .fractions ? 
+                         String(format: "%.2f", Double(option) / 100.0) : 
+                         "\(option)")
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundColor(currentAnswer == String(option) ? .white : gameType.color)
                         .frame(maxWidth: .infinity)
