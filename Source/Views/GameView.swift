@@ -168,63 +168,6 @@ struct GameQuestion: View, Equatable {
     }
 }
 
-struct GameAnswerOptions: View, Equatable {
-    let gameType: GameType
-    let options: [Int]
-    let currentAnswer: String
-    let isCorrect: Bool
-    let onSelect: (Int) -> Void
-    
-    static func == (lhs: GameAnswerOptions, rhs: GameAnswerOptions) -> Bool {
-        lhs.gameType == rhs.gameType &&
-        lhs.options == rhs.options &&
-        lhs.currentAnswer == rhs.currentAnswer &&
-        lhs.isCorrect == rhs.isCorrect
-    }
-    
-    var body: some View {
-        VStack(spacing: 16) {
-            ForEach(options, id: \.self) { option in
-                Button(action: { onSelect(option) }) {
-                    Text(gameType == .decimals || gameType == .fractions ? 
-                         String(format: "%.2f", Double(option) / 100.0) : 
-                         "\(option)")
-                        .font(.system(size: 32, weight: .bold, design: .rounded))
-                        .foregroundColor(currentAnswer == String(option) ? .white : gameType.color)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 60)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(
-                                    currentAnswer == String(option) ?
-                                        (isCorrect ? Color.green : Color.red) :
-                                        Color.white
-                                )
-                                .shadow(
-                                    color: (currentAnswer == String(option) ? 
-                                        (isCorrect ? Color.green : Color.red) : 
-                                        gameType.color).opacity(0.2),
-                                    radius: 4, x: 0, y: 2
-                                )
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(
-                                    currentAnswer == String(option) ?
-                                        (isCorrect ? Color.green : Color.red) :
-                                        gameType.color.opacity(0.3),
-                                    lineWidth: currentAnswer == String(option) ? 2 : 1
-                                )
-                        )
-                }
-                .disabled(!currentAnswer.isEmpty)
-                .animation(.spring(response: 0.3), value: currentAnswer)
-            }
-        }
-        .padding(.horizontal, 32)
-    }
-}
-
 struct GameFeedback: View {
     let message: String
     let isCorrect: Bool

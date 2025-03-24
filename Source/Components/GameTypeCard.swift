@@ -128,16 +128,18 @@ struct ScaleButtonStyle: ButtonStyle {
             gameType: .addition,
             level: 3,
             progress: 0.7,
-            isLocked: false
-        ) {}
+            isLocked: false,
+            onTap: {}
+        )
         .environmentObject(LocalizationManager())
         
         GameTypeCard(
             gameType: .multiplication,
             level: 1,
             progress: 0.3,
-            isLocked: true
-        ) {}
+            isLocked: true,
+            onTap: {}
+        )
         .environmentObject(LocalizationManager())
     }
     .padding()

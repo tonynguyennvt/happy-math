@@ -51,13 +51,14 @@ struct SubtractionGameView: View {
                     gameType: .subtraction,
                     options: viewModel.answerOptions,
                     currentAnswer: viewModel.currentAnswer,
-                    isCorrect: viewModel.isCorrect
-                ) { option in
-                    withAnimation(.spring(response: 0.3)) {
-                        viewModel.checkAnswer(option)
-                        progressManager.updateProgress(for: .subtraction, isCorrect: viewModel.isCorrect)
+                    isCorrect: viewModel.isCorrect,
+                    onSelect: { answer in
+                        withAnimation(.spring(response: 0.3)) {
+                            viewModel.checkAnswer(answer)
+                            progressManager.updateProgress(for: .subtraction, isCorrect: viewModel.isCorrect)
+                        }
                     }
-                }
+                )
                 
                 Spacer()
             }
