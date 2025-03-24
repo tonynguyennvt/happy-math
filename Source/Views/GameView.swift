@@ -228,22 +228,3 @@ struct GameFeedback: View {
             .animation(.spring(response: 0.4), value: message)
     }
 }
-
-// Preview
-struct GameView_Previews: PreviewProvider {
-    static var previews: some View {
-        GameView(gameType: .addition)
-            .environmentObject(ProgressManager())
-            .environmentObject(LocalizationManager())
-    }
-}
-
-// Extension to ensure the view is presented in full screen style
-extension View {
-    func fullScreenGameView() -> some View {
-        self.presentationBackground(.white)
-            .presentationDragIndicator(.hidden)
-            .presentationDetents([.large])
-            .presentationCornerRadius(0)
-    }
-}

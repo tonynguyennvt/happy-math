@@ -10,9 +10,6 @@ struct LoadingView: View {
     
     @State private var isAnimating = false
     @State private var textScale: CGFloat = 1.0
-    @State private var showStars = false
-    @State private var showBubbles = false
-    @State private var showHearts = false
     
     var body: some View {
         Group {
@@ -109,9 +106,6 @@ struct LoadingView: View {
         .onAppear {
             isAnimating = true
             textScale = 1.1
-            showStars = true
-            showBubbles = true
-            showHearts = true
             
             // Transition to main view after animations
             DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
