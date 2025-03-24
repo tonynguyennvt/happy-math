@@ -201,4 +201,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-Created with ❤️ for making math fun and accessible to children everywhere.
+Created with ❤️ for making math fun and accessible to children ages 5-12 everywhere.
